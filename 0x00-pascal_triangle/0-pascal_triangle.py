@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 def pascal_triangle(n):
   """
   This function returns a list of lists representing the Pascal's triangle of size n.
@@ -28,7 +29,7 @@ def pascal_triangle(n):
 
   return triangle
 
-# Example usage
-n = 5
-triangle = pascal_triangle(n)
-print(triangle)  # Output: [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
+# # Example usage
+# n = 5
+# triangle = pascal_triangle(n)
+# print(triangle)  # Output: [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
