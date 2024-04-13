@@ -22,3 +22,4 @@ def pascal_triangle(n):
         temp.append(1)
         k.append(temp)
     return k
+  
