@@ -1,18 +1,26 @@
+#!/usr/bin/python3
+"""
+Module that solves the problem of unlocking all boxes
+"""
+
+
 def canUnlockAll(boxes):
-    
-    visited = [False] * len(boxes)  # Keep track of visited boxes
-    visited[0] = True  # Mark the first box as visited
-    stack = [0]  # Start with the first box
-    """_summary_
+    """
+    Determines if all the boxes can be opened.
+
+    Args:
+        boxes (list): A list of lists, where each inner list represents
+                      the keys contained in that box.
 
     Returns:
-        _type_: _description_
+        bool: True if all boxes can be opened, False otherwise.
     """
-    while stack:
-        box = stack.pop()  # Get the top box from the stack
-        for key in boxes[box]:
-            if not visited[key]:
-                visited[key] = True  # Mark the box as visited
-                stack.append(key)  # Add the box to the stack
+    unlocked = [0]  # Start with box 0 unlocked
+    keys = boxes[0]  # Keys found in box 0
 
-    return all(visited)  # Return True if all boxes are visited, else False
+    for box_id in keys:
+        if box_id < len(boxes) and box_id not in unlocked:
+            unlocked.append(box_id)
+            keys.extend(boxes[box_id])
+
+    return len(unlocked) == len(boxes)
