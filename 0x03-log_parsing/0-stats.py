@@ -1,59 +1,72 @@
-#!/usr/bin/python3
 import sys
-#createing a log parser with python
-def print_stats(total_size, status_codes):
-    """
-    Prints the total file size and the count of each status code.
 
-    Args:
-        total_size (int): The total file size.
-        status_codes (dict): A dictionary containing the count of each status code.
-    """
-    print("Total file size:", total_size)
-    for code in sorted(status_codes.keys()):
-        print(f"{code}: {status_codes[code]}")
+# Function to print statistics
+def print_stats(total_size, status_counts):
+    print(f"Total file size: {total_size}")
 
+    # Sort the status codes in ascending order
+    sorted_codes = sorted(status_counts.keys())
+
+    # Print the count for each status code
+    for code in sorted_codes:
+        count = status_counts[code]
+        if count > 0:
+            print(f"{code}: {count}")
+
+# Function to parse a line of input
 def parse_line(line):
-    """
-    Parses a line of input and returns the IP address, status code, and file size.
-
-    Args:
-        line (str): A line of input in the format '<IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>'.
-
-    Returns:
-        tuple: A tuple containing the IP address, status code, and file size, or None if the line is not in the expected format.
-    """
     parts = line.split()
+
+    # Check if the line has at least 7 parts
     if len(parts) < 7:
         return None
-    ip, _, _, _, status_code, file_size = parts[:6]
+
+    status_code = parts[5]
+    file_size = parts[6]
+
+    # Check if the status code is a valid integer
     if not status_code.isdigit():
         return None
-    return ip, int(status_code), int(file_size)
+
+    # Return the status code and file size as integers
+    return int(status_code), int(file_size)
 
 def main():
-    """
-    The main function that reads from stdin, computes the metrics, and prints the statistics.
-    """
     total_size = 0
-    status_codes = {}
+    status_counts = {}
+
+    # Initialize a list of possible status codes
+    status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
+
+    # Initialize the counts for each status code to 0
+    for code in status_codes:
+        status_counts[code] = 0
+
+    line_count = 0
 
     try:
-        for i, line in enumerate(sys.stdin, 1):
+        # Read lines from stdin
+        for line in sys.stdin:
+            line_count += 1
+
+            # Parse the line and extract the status code and file size
             parsed = parse_line(line)
             if parsed is None:
                 continue
 
-            ip, status_code, file_size = parsed
-            total_size += file_size
-            status_codes[status_code] = status_codes.get(status_code, 0) + 1
+            status_code, file_size = parsed
 
-            if i % 10 == 0:
-                print_stats(total_size, status_codes)
+            # Update the total file size and the count for the status code
+            total_size += file_size
+            status_counts[status_code] += 1
+
+            # Print statistics after every 10 lines
+            if line_count % 10 == 0:
+                print_stats(total_size, status_counts)
 
     except KeyboardInterrupt:
-        print_stats(total_size, status_codes)
+        # Print final statistics if the user interrupts the script
+        print_stats(total_size, status_counts)
 
 if __name__ == "__main__":
     main()
-    
