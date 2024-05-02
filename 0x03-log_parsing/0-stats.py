@@ -1,51 +1,59 @@
 #!/usr/bin/python3
-import re
 import sys
-"""
-    Parses log entries from stdin and calculates file size and status code counts.
+#createing a log parser with python
+def print_stats(total_size, status_codes):
+    """
+    Prints the total file size and the count of each status code.
 
-    This function reads log entries from the standard input and performs the following tasks:
-    - Calculates the total file size by summing the file sizes in the log entries.
-    - Counts the occurrences of different HTTP status codes (200, 301, 400, 401, 403, 404, 405, 500).
+    Args:
+        total_size (int): The total file size.
+        status_codes (dict): A dictionary containing the count of each status code.
+    """
+    print("Total file size:", total_size)
+    for code in sorted(status_codes.keys()):
+        print(f"{code}: {status_codes[code]}")
 
-    The log entries are expected to have the following format:
-    <IP address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
+def parse_line(line):
+    """
+    Parses a line of input and returns the IP address, status code, and file size.
 
-    The function prints the file size and the count of each status code every 10 log entries.
-
-    Raises:
-        None
+    Args:
+        line (str): A line of input in the format '<IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>'.
 
     Returns:
-        None
- """
-def print_stats(file_size, status_counts):
-    print("File size: {}".format(file_size))
-    for status_code in sorted(status_counts.keys()):
-        if status_counts[status_code] > 0:
-            print("{}: {}".format(status_code, status_counts[status_code]))
+        tuple: A tuple containing the IP address, status code, and file size, or None if the line is not in the expected format.
+    """
+    parts = line.split()
+    if len(parts) < 7:
+        return None
+    ip, _, _, _, status_code, file_size = parts[:6]
+    if not status_code.isdigit():
+        return None
+    return ip, int(status_code), int(file_size)
 
-line_count = 0
-file_size = 0
-status_counts = {
-    200: 0, 301: 0, 400: 0, 401: 0,
-    403: 0, 404: 0, 405: 0, 500: 0
-}
+def main():
+    """
+    The main function that reads from stdin, computes the metrics, and prints the statistics.
+    """
+    total_size = 0
+    status_codes = {}
 
-try:
-    for line in sys.stdin:
-        line_count += 1
-        match = re.match(r'^\d+\.\d+\.\d+\.\d+ - \[.+?\] "GET \/projects\/260 HTTP\/1.1" (\d+) (\d+)', line)
-        if match:
-            status_code = int(match.group(1))
-            file_size_incr = int(match.group(2))
-            file_size += file_size_incr
-            if status_code in status_counts:
-                status_counts[status_code] += 1
+    try:
+        for i, line in enumerate(sys.stdin, 1):
+            parsed = parse_line(line)
+            if parsed is None:
+                continue
 
-        if line_count % 10 == 0:
-            print_stats(file_size, status_counts)
+            ip, status_code, file_size = parsed
+            total_size += file_size
+            status_codes[status_code] = status_codes.get(status_code, 0) + 1
 
-except KeyboardInterrupt:
-    print_stats(file_size, status_counts)
+            if i % 10 == 0:
+                print_stats(total_size, status_codes)
+
+    except KeyboardInterrupt:
+        print_stats(total_size, status_codes)
+
+if __name__ == "__main__":
+    main()
     
