@@ -1,10 +1,7 @@
 #!/usr/bin/python3
-
-import sys
 import re
-
-def log_parser():
-    """
+import sys
+"""
     Parses log entries from stdin and calculates file size and status code counts.
 
     This function reads log entries from the standard input and performs the following tasks:
@@ -21,34 +18,34 @@ def log_parser():
 
     Returns:
         None
-    """
-    file_size = 0
-    status_counts = {
-        200: 0, 301: 0, 400: 0, 401: 0,
-        403: 0, 404: 0, 405: 0, 500: 0
-    }
-    line_count = 0
+ """
+def print_stats(file_size, status_counts):
+    print("File size: {}".format(file_size))
+    for status_code in sorted(status_counts.keys()):
+        if status_counts[status_code] > 0:
+            print("{}: {}".format(status_code, status_counts[status_code]))
 
-    try:
-        for line in sys.stdin:
-            line_count += 1
-            match = re.match(r'^[\d+\.]+\s-\s\[.+\]\s"GET\s\/projects\/260\sHTTP\/1\.1"\s(\d+)\s(\d+)$', line)
-            if match:
-                status_code = int(match.group(1))
-                file_size += int(match.group(2))
-                if status_code in status_counts:
-                    status_counts[status_code] += 1
+line_count = 0
+file_size = 0
+status_counts = {
+    200: 0, 301: 0, 400: 0, 401: 0,
+    403: 0, 404: 0, 405: 0, 500: 0
+}
 
-            if line_count % 10 == 0:
-                print("File size: {}".format(file_size))
-                for code in sorted(status_counts.keys()):
-                    if status_counts[code] > 0:
-                        print("{}: {}".format(code, status_counts[code]))
+try:
+    for line in sys.stdin:
+        line_count += 1
+        match = re.match(r'^\d+\.\d+\.\d+\.\d+ - \[.+?\] "GET \/projects\/260 HTTP\/1.1" (\d+) (\d+)', line)
+        if match:
+            status_code = int(match.group(1))
+            file_size_incr = int(match.group(2))
+            file_size += file_size_incr
+            if status_code in status_counts:
+                status_counts[status_code] += 1
 
-    except KeyboardInterrupt:
-        print("File size: {}".format(file_size))
-        for code in sorted(status_counts.keys()):
-            if status_counts[code] > 0:
-                print("{}: {}".format(code, status_counts[code]))
+        if line_count % 10 == 0:
+            print_stats(file_size, status_counts)
 
-log_parser()
+except KeyboardInterrupt:
+    print_stats(file_size, status_counts)
+    
