@@ -1,72 +1,62 @@
+#!/usr/bin/python3
+"""Log parsing module"""
 import sys
-#log parsing
-def print_stats(total_size, status_codes):
+import signal
+import re
+
+
+# Initialize variables
+total_file_size = 0
+status_code_counts = {}
+
+# Regular expression pattern
+pattern = r'^(\d+\.\d+\.\d+\.\d+) - \[(\d+/\w+/\d+:\d+:\d+:\d+) \+\d+\] ' \
+          r'"GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
+
+
+def signal_handler(signal, frame):
     """
-    Print the total file size and the count of each status code.
-
-    Args:
-        total_size (int): The total size of the file.
-        status_codes (dict): A dictionary containing the count of each status code.
-    """    
-    print("Total file size:", total_size)
-    for code in sorted(status_codes.keys()):
-        print(f"{code}: {status_codes[code]}")
-
-def parse_line(line):
-    """_summary_
-
-    Args:
-        line (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """    
-    parts = line.split()
-    if len(parts) < 7:
-        return None
-    ip_address = parts[0]
-    status_code = parts[-2]
-    file_size = parts[-1]
-    if not status_code.isdigit():
-        return None
-    return ip_address, int(status_code), int(file_size)
-
-def process_logs():
+    Handle keyboard interruption (CTRL + C)
+    and print metrics.
     """
-    Process logs from standard input and calculate statistics.
+    print_metrics()
 
-    This function reads log lines from the standard input, parses each line,
-    and calculates statistics such as total size and status code counts.
-    It prints the statistics every 10 lines, and also handles keyboard interrupt
-    to print the final statistics.
 
-    Args:
-        None
-
-    Returns:
-        None
+def print_metrics():
     """
+    Print the computed metrics:
+    - Total file size
+    - Number of lines by status code
+    """
+    print(f"File size: {total_file_size}")
+    sorted_codes = sorted(status_code_counts.keys())
+    for code in sorted_codes:
+        count = status_code_counts[code]
+        if count > 0:
+            print(f"{code}: {count}")
 
-    total_size = 0
-    status_codes = {}
-    line_count = 0
 
-    try:
-        for line in sys.stdin:
-            line = line.strip()
-            parsed_line = parse_line(line)
-            if parsed_line is None:
-                continue
- 
-            _, status_code, file_size = parsed_line
-            total_size += file_size
-            status_codes[status_code] = status_codes.get(status_code, 0) + 1
+# Set the signal handler
+signal.signal(signal.SIGINT, signal_handler)
 
-            line_count += 1
-            if line_count % 10 == 0:
-                print_stats(total_size, status_codes)
+# Read input from stdin
+line_count = 0
+for line in sys.stdin:
+    line_count += 1
 
-    except KeyboardInterrupt:
-        print_stats(total_size, status_codes)
+    # Parse the input line
+    match = re.match(pattern, line)
+    if match:
+        status_code = int(match.group(3))
+        file_size = int(match.group(4))
 
-process_logs()
+        # Update metrics
+        total_file_size += file_size
+        status_code_counts[status_code] = status_code_counts.get(status_code, 0) + 1
+
+    # Print metrics after every 10 lines
+    if line_count % 10 == 0:
+        print_metrics()
+
+# Print final metrics
+print_metrics()
