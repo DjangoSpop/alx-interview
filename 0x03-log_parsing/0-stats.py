@@ -1,63 +1,70 @@
 #!/usr/bin/python3
-"""Log parsing module"""
 import sys
-import signal
-import re
-import random
 
 
-# Initialize variables
-total_file_size = 0
-status_code_counts = {}
-
-# Regular expression pattern
-pattern = r'^(\d+\.\d+\.\d+\.\d+) - \[(\d+/\w+/\d+:\d+:\d+:\d+) \+\d+\] ' \
-          r'"GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
-
-
-def signal_handler(signal, frame):
+def parse_log_line(line):
     """
-    Handle keyboard interruption (CTRL + C)
-    and print metrics.
+    Parse a log line and extract the IP address, status code, and file size.
+
+    Args:
+        line (str): The log line to parse.
+
+    Returns:
+        tuple: A tuple containing the IP address, status code, and file size.
     """
-    print_metrics()
+    try:
+        parts = line.strip().split()
+        ip_address = parts[0]
+        status_code = int(parts[-2])
+        file_size = int(parts[-1])
+        return ip_address, status_code, file_size
+    except Exception as e:
+        return None, None, None
 
 
-def print_metrics():
+def main():
     """
-    Print the computed metrics:
-    - Total file size
-    - Number of lines by status code
+    Read log lines from standard input, parse them, and calculate statistics.
+
+    The function reads log lines from standard input and parses each line to extract the IP address,
+    status code, and file size. It then updates the total file size and counts the occurrences of
+    each status code. After processing 10 lines, it prints the total file size and the count of each
+    status code. The function handles keyboard interrupts and prints the statistics before exiting.
     """
-    print(f"File size: {total_file_size}")
-    sorted_codes = sorted(status_code_counts.keys())
-    for code in sorted_codes:
-        count = status_code_counts.get(code, 0)
-        if count > 0 and code in [200, 301, 400, 401, 403, 404, 405, 500]:
-            print(f"{code}: {count}")
+    total_file_size = 0
+    status_code_counts = {
+        200: 0,
+        301: 0,
+        400: 0,
+        401: 0,
+        403: 0,
+        404: 0,
+        405: 0,
+        500: 0}
+    line_count = 0
+
+    try:
+        for line in sys.stdin:
+            ip_address, status_code, file_size = parse_log_line(line)
+            if ip_address is not None and status_code is not None and file_size is not None:
+                total_file_size += file_size
+                status_code_counts[status_code] += 1
+                line_count += 1
+
+            if line_count == 10:
+                print("Total file size:", total_file_size)
+                for code in sorted(status_code_counts.keys()):
+                    if status_code_counts[code] > 0:
+                        print(f"{code}: {status_code_counts[code]}")
+                line_count = 0
+
+    except KeyboardInterrupt:
+        print("Total file size:", total_file_size)
+        for code in sorted(status_code_counts.keys()):
+            if status_code_counts[code] > 0:
+                print(f"{code}: {status_code_counts[code]}")
+        sys.exit(0)
 
 
-# Set the signal handler
-signal.signal(signal.SIGINT, signal_handler)
-
-# Read input from stdin
-line_count = 0
-for line in sys.stdin:
-    line_count += 1
-
-    # Parse the input line
-    match = re.match(pattern, line)
-    if match:
-        status_code = int(match.group(3))
-        file_size = int(match.group(4))
-
-        # Update metrics
-        total_file_size += file_size
-        status_code_counts[status_code] = status_code_counts.get(status_code, 0) + 1
-
-    # Print metrics after every 10 lines
-    if line_count % 10 == 0:
-        print_metrics()
-
-# Print final metrics
-print_metrics()
+if __name__ == "__main__":
+    main()
