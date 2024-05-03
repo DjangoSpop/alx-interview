@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 import sys
 import datetime
+"""
+This module is used for parsing log lines from a specific format.
+
+The log line format is: <IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
+"""
 # crate function to read the std in then parse the log line
 def parse_log_line(line):
     """
