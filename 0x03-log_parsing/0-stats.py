@@ -1,78 +1,63 @@
 #!/usr/bin/python3
-import sys
+#createimport sys
+import re
+import signal
+"""_summary_
 
+    Raises:
+        TimeoutError: _description_
+"""
+# Setting up the counters
+total_size = 0
+line_count = 0
+status_codes_count = {'200': 0, '301': 0, '400': 0, '401': 0, '403': 0, '404': 0, '405' : 0, '500' : 0}
+ 
+# Regex to check the correct format of each line
+line_format = re.compile(r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \[(.*?)\] "(GET|POST|DELETE) /project/.* HTTP/1\.[01]" (\d{3}) \d+$')
 
-def parse_log_line(line):
-    """
-    Parses a log line and extracts the status code and file size.
+def handle_timeout(signum, frame):
+    raise TimeoutError
+
+# Set up signal for every 10 lines
+signal.signal(signal.SIGALRM, handle_timeout)
+
+import re
+
+line_format = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - \[(.*?)\] "(.*?)" (\d{3})')
+
+def parse_line(line):
+    """Parses a log line and updates the status code count and total size.
 
     Args:
         line (str): The log line to parse.
 
-    Returns:
-        tuple: A tuple containing the status code and file size if the line is valid, otherwise None.
     """
-    parts = line.split()
-    if len(parts) < 7:
-        return None
-    try:
-        status_code = int(parts[-2])
-        file_size = int(parts[-1])
-        return status_code, file_size
-    except ValueError:
-        return None
+    global total_size, line_count
+    match = line_format.match(line)
+    if match:
+        ip, date, method, status_code = match.groups()
+        # Update status code count and total size
+        if status_code in status_codes_count:
+            status_codes_count[status_code] += 1
+        # Simulating file size increment
+        total_size += len(line)  # Example increment, adjust as needed
+        line_count += 1
 
-
-def print_statistics(total_size, status_counts):
-    """
-    Prints the total file size and the count of each status code.
-
-    Args:
-        total_size (int): The total file size.
-        status_counts (dict): A dictionary containing the count of each status code.
-    """
-    print(f"File size: {total_size}")
-    for code in sorted(status_counts.keys()):
-        if status_counts[code] > 0:
-            print(f"{code}: {status_counts[code]}")
-
-
-def main():
-    """
-    The main function that reads log lines from stdin, parses them, and prints statistics.
-
-    It reads log lines from stdin, parses each line using the `parse_log_line` function,
-    updates the total file size and status code counts, and prints statistics every 10 lines.
-    If the program is interrupted by a keyboard interrupt (Ctrl+C), it prints the final statistics.
-    """
-    total_size = 0
-    status_counts = {
-        200: 0,
-        301: 0,
-        400: 0,
-        401: 0,
-        403: 0,
-        404: 0,
-        405: 0,
-        500: 0}
-    line_count = 0
-
-    try:
-        for line in sys.stdin:
-            parsed = parse_log_line(line)
-            if parsed:
-                status_code, file_size = parsed
-                total_size += file_size
-                status_counts[status_code] += 1
-                line_count += 1
-
-            if line_count == 10:
-                print_statistics(total_size, status_counts)
-                line_count = 0
-
-    except KeyboardInterrupt:
-        print_statistics(total_size, status_counts)
-
-
-if __name__ == "__main__":
-    main()
+try:
+    while True:
+        try:
+            # Set an alarm for 10 lines
+            if line_count % 10 == 0:
+                signal.alarm(1)  # Set the alarm for 1 second, adjust as needed
+            line = input()
+            parse_line(line)
+        except TimeoutError:
+            print("Processed 10 lines.")
+            print(f"Total Size: {total_size}")
+            print(f"Status Codes: {status_codes_count}")
+            # Reset the alarm
+            signal.alarm(0)
+except KeyboardInterrupt:
+    print("Program terminated by user.")
+    print(f"Final Total Size: {total_size}")
+    print(f"Final Status Codes: {status_codes_count}")
