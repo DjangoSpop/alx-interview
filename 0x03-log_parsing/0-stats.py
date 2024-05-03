@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#createimport sys
+# createimport sys
 import re
 import signal
 """_summary_
@@ -10,26 +10,54 @@ import signal
 # Setting up the counters
 total_size = 0
 line_count = 0
-status_codes_count = {'200': 0, '301': 0, '400': 0, '401': 0, '403': 0, '404': 0, '405' : 0, '500' : 0}
- 
+status_codes_count = {
+    '200': 0,
+    '301': 0,
+    '400': 0,
+    '401': 0,
+    '403': 0,
+    '404': 0,
+    '405': 0,
+    '500': 0}
+"""_summary_
+
+    Raises:
+        TimeoutError: _description_
+"""
 # Regex to check the correct format of each line
-line_format = re.compile(r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \[(.*?)\] "(GET|POST|DELETE) /project/.* HTTP/1\.[01]" (\d{3}) \d+$')
+line_format = re.compile(
+    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) \[(.*?)\] "(GET|POST|DELETE) /project/.* HTTP/1\.[01]" (\d{3}) \d+$')
+
 
 def handle_timeout(signum, frame):
+    """_summary_
+
+    Args:
+        signum (_type_): _description_
+        frame (_type_): _description_
+
+    Raises:
+        TimeoutError: _description_
+    """
     raise TimeoutError
+
 
 # Set up signal for every 10 lines
 signal.signal(signal.SIGALRM, handle_timeout)
 
-import re
 
-line_format = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - \[(.*?)\] "(.*?)" (\d{3})')
+line_format = re.compile(
+    r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - \[(.*?)\] "(.*?)" (\d{3})')
+
 
 def parse_line(line):
     """Parses a log line and updates the status code count and total size.
 
     Args:
         line (str): The log line to parse.
+
+    Returns:
+        None
 
     """
     global total_size, line_count
@@ -42,6 +70,7 @@ def parse_line(line):
         # Simulating file size increment
         total_size += len(line)  # Example increment, adjust as needed
         line_count += 1
+
 
 try:
     while True:
