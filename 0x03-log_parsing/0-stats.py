@@ -1,5 +1,15 @@
 #!/usr/bin/python3
+
+"""_summary_
+
+    Raises:
+        TimeoutError: _description_
+"""
+
 # createimport sys
+import re
+import signal
+import sys
 import re
 import signal
 """_summary_
@@ -30,14 +40,14 @@ line_format = re.compile(
 
 
 def handle_timeout(signum, frame):
-    """_summary_
+    """Handle timeout error.
 
     Args:
-        signum (_type_): _description_
-        frame (_type_): _description_
+        signum (int): The signal number.
+        frame (frame): The current stack frame.
 
     Raises:
-        TimeoutError: _description_
+        TimeoutError: Raised when a timeout occurs.
     """
     raise TimeoutError
 
@@ -51,14 +61,13 @@ line_format = re.compile(
 
 
 def parse_line(line):
-    """Parses a log line and updates the status code count and total size.
+    """Parse a log line and update the status code count and total size.
 
     Args:
         line (str): The log line to parse.
 
     Returns:
         None
-
     """
     global total_size, line_count
     match = line_format.match(line)

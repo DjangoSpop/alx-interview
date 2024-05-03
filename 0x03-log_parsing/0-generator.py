@@ -5,6 +5,9 @@ from time import sleep
 import datetime
 
 def generate_log_line():
+    """
+    Generate a log line with random data.
+    """
     ip_address = ".".join(str(random.randint(1, 255)) for _ in range(4))
     date_time = datetime.datetime.now()
     status_code = random.choice([200, 301, 400, 401, 403, 404, 405, 500])
