@@ -6,7 +6,7 @@
         TimeoutError: _description_
 """
 
-# createimport sys
+# createimport system
 import re
 import signal
 import sys
