@@ -11,14 +11,17 @@ from collections import defaultdict
 
 def validate_format(log):
     """
-    Validates if a log entry matches the required format.
+    Validates if a log entry matches the required format:
+    IP Address - [date] "GET /projects/260 HTTP/1.1" status_code file_size
+    Returns True if the log is valid, False otherwise.
     """
     pattern = r'^\d{1,3}(\.\d{1,3}){3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] "GET /projects/260 HTTP/1\.1" \d{3} \d+$'
     return bool(re.match(pattern, log))
 
 def parse_log(log):
     """
-    Parses a log entry into status code and file size, assuming the format is validated.
+    Parses a log entry into status code and file size, assuming the format is valid.
+    Returns a tuple (status_code, file_size).
     """
     parts = log.split()
     status_code = parts[-2]
@@ -28,17 +31,14 @@ def parse_log(log):
 def print_stats(file_size, status_codes):
     """
     Prints the statistics for file size and status codes.
-    Only prints statistics for specified valid status codes.
     """
-    valid_status_codes = {"200", "301", "400", "401", "403", "404", "405", "500"}
     print('File size:', file_size)
     for code in sorted(status_codes.keys()):
-        if code in valid_status_codes:
-            print(f"{code}: {status_codes[code]}")
+        print(f"{code}: {status_codes[code]}")
 
 def main():
     """
-    Reads log entries from stdin, validates their format,
+    Continuously reads log entries from stdin, validates their format,
     and prints cumulative metrics every 10 lines or upon a keyboard interruption.
     """
     status_codes_count = defaultdict(int)
@@ -50,16 +50,16 @@ def main():
             if validate_format(log):
                 status_code, file_size = parse_log(log)
                 total_size += file_size
-                if status_code in {"200", "301", "400", "401", "403", "404", "405", "500"}:
-                    status_codes_count[status_code] += 1
+                status_codes_count[status_code] += 1
                 log_count += 1
+
                 if log_count % 10 == 0:
                     print_stats(total_size, status_codes_count)
     except KeyboardInterrupt:
         print_stats(total_size, status_codes_count)
         sys.exit("Interrupted by user")
 
-    # Print leftover stats if not exactly multiple of 10
+    # In case the stream ends without an interrupt
     if log_count % 10 != 0:
         print_stats(total_size, status_codes_count)
 
