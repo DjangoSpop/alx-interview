@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 
+
 def parse_log_line(line):
     """
     Parses a log line and extracts the status code and file size.
@@ -21,6 +22,7 @@ def parse_log_line(line):
     except ValueError:
         return None
 
+
 def print_statistics(total_size, status_counts):
     """
     Prints the total file size and the count of each status code.
@@ -34,6 +36,7 @@ def print_statistics(total_size, status_counts):
         if status_counts[code] > 0:
             print(f"{code}: {status_counts[code]}")
 
+
 def main():
     """
     The main function that reads log lines from stdin, parses them, and prints statistics.
@@ -43,7 +46,15 @@ def main():
     If the program is interrupted by a keyboard interrupt (Ctrl+C), it prints the final statistics.
     """
     total_size = 0
-    status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+    status_counts = {
+        200: 0,
+        301: 0,
+        400: 0,
+        401: 0,
+        403: 0,
+        404: 0,
+        405: 0,
+        500: 0}
     line_count = 0
 
     try:
@@ -61,6 +72,7 @@ def main():
 
     except KeyboardInterrupt:
         print_statistics(total_size, status_counts)
+
 
 if __name__ == "__main__":
     main()
