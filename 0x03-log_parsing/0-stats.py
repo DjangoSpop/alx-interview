@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 """
-Log stats module
-This script reads from stdin line by line and computes metrics such as total file size
-and the number of occurrences of each status code for formatted log entries.
+This script reads log data from stdin and computes metrics such as total file size
+and the number of occurrences of each status code. It expects each log entry to be in a specific format:
+<IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
+If an entry does not match this format, it is skipped. Metrics are printed after each log entry and upon program exit.
 """
 
 import sys
@@ -30,11 +31,9 @@ def print_stats(file_size, status_codes):
     Prints the statistics for file size and status codes.
     Only prints statistics for specified valid status codes.
     """
-    valid_status_codes = {"200", "301", "400", "401", "403", "404", "405", "500"}
     print('File size:', file_size)
     for code in sorted(status_codes.keys()):
-        if code in valid_status_codes:
-            print(f"{code}: {status_codes[code]}")
+        print(f"{code}: {status_codes[code]}")
 
 status_codes_count = defaultdict(int)
 total_size = 0
@@ -45,15 +44,15 @@ try:
         if validate_format(log):
             status_code, file_size = parse_log(log)
             total_size += file_size
-            if status_code in {"200", "301", "400", "401", "403", "404", "405", "500"}:
-                status_codes_count[status_code] += 1
+            status_codes_count[status_code] += 1
             log_count += 1
-            # Print stats after each valid log is processed
             print_stats(total_size, status_codes_count)
-
 except KeyboardInterrupt:
     print_stats(total_size, status_codes_count)
     sys.exit("Interrupted by user")
+
+if log_count == 0:
+    print("No valid log entries processed.")
 
 # Print final stats if any logs were processed
 if log_count > 0:
