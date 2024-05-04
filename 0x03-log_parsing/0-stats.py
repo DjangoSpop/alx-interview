@@ -1,29 +1,24 @@
+#!/usr/bin/python3
+"""
+Log stats module
+This script reads from stdin line by line and computes metrics such as total file size
+and the number of occurrences of each status code for formatted log entries.
+"""
+
 import sys
 import re
 from collections import defaultdict
 
 def validate_format(log):
     """
-    Validates the format of a log entry.
-
-    Args:
-        log (str): The log entry to validate.
-
-    Returns:
-        bool: True if the log entry is in the correct format, False otherwise.
+    Validates if a log entry matches the required format.
     """
     pattern = r'^\d{1,3}(\.\d{1,3}){3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] "GET /projects/260 HTTP/1\.1" \d{3} \d+$'
     return bool(re.match(pattern, log))
 
 def parse_log(log):
     """
-    Parses a log entry and extracts the status code and file size.
-
-    Args:
-        log (str): The log entry to parse.
-
-    Returns:
-        tuple: A tuple containing the status code (str) and file size (int).
+    Parses a log entry into status code and file size, assuming the format is validated.
     """
     parts = log.split()
     status_code = parts[-2]
@@ -32,14 +27,8 @@ def parse_log(log):
 
 def print_stats(file_size, status_codes):
     """
-    Prints the file size and the count of each valid status code.
-
-    Args:
-        file_size (int): The total file size.
-        status_codes (dict): A dictionary containing the count of each status code.
-
-    Returns:
-        None
+    Prints the statistics for file size and status codes.
+    Only prints statistics for specified valid status codes.
     """
     valid_status_codes = {"200", "301", "400", "401", "403", "404", "405", "500"}
     print('File size:', file_size)
@@ -60,12 +49,9 @@ try:
                 status_codes_count[status_code] += 1
             log_count += 1
 
-        if log_count % 10 == 0:
+            # Print stats after each valid log is processed
             print_stats(total_size, status_codes_count)
 
 except KeyboardInterrupt:
     print_stats(total_size, status_codes_count)
     sys.exit("Interrupted by user")
-
-if log_count % 10 != 0 or log_count == 0:
-    print_stats(total_size, status_codes_count)
