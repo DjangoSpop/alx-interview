@@ -1,3 +1,7 @@
+import sys
+import re
+from collections import defaultdict
+
 #!/usr/bin/python3
 """
 Log stats module
@@ -5,9 +9,6 @@ This script reads from stdin line by line and computes metrics such as total fil
 and the number of occurrences of each status code for formatted log entries.
 """
 
-import sys
-import re
-from collections import defaultdict
 
 def validate_format(log):
     """
@@ -36,35 +37,27 @@ def print_stats(file_size, status_codes):
         if code in valid_status_codes:
             print(f"{code}: {status_codes[code]}")
 
-def main():
-    """
-    Reads log entries from stdin, validates their format,
-    and prints cumulative metrics every 10 lines or upon a keyboard interruption.
-    """
-    status_codes_count = defaultdict(int)
-    total_size = 0
-    log_count = 0
+status_codes_count = defaultdict(int)
+total_size = 0
+log_count = 0
 
-    try:
-        for log in sys.stdin:
-            if validate_format(log):
-                status_code, file_size = parse_log(log)
-                total_size += file_size
-                if status_code in {"200", "301", "400", "401", "403", "404", "405", "500"}:
-                    status_codes_count[status_code] += 1
-                log_count += 1
+try:
+    for log in sys.stdin:
+        if validate_format(log):
+            status_code, file_size = parse_log(log)
+            total_size += file_size
+            if status_code in {"200", "301", "400", "401", "403", "404", "405", "500"}:
+                status_codes_count[status_code] += 1
+            log_count += 1
 
-            # Change to ensure statistics are printed even if fewer than 10 logs are processed
-            if log_count > 0 and log_count % 10 == 0:
-                print_stats(total_size, status_codes_count)
+        # Change to ensure statistics are printed even if fewer than 10 logs are processed
+        if log_count > 0 and log_count % 10 == 0:
+            print_stats(total_size, status_codes_count)
 
-    except KeyboardInterrupt:
-        print_stats(total_size, status_codes_count)
-        sys.exit("Interrupted by user")
+except KeyboardInterrupt:
+    print_stats(total_size, status_codes_count)
+    sys.exit("Interrupted by user")
 
-    # Print leftover stats if not exactly multiple of 10
-    if log_count % 10 != 0 or log_count == 0:
-        print_stats(total_size, status_codes_count)
-
-if __name__ == '__main__':
-    main()
+# Print leftover stats if not exactly multiple of 10
+if log_count % 10 != 0 or log_count == 0:
+    print_stats(total_size, status_codes_count)
