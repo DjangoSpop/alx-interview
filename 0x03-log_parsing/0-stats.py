@@ -26,6 +26,12 @@ try:
             status_counts[status_code] += 1
             line_count += 1
 
+            if line_count == 1:
+                print(f"File size: {total_size}")
+                for code in sorted(status_counts.keys()):
+                    if status_counts[code] > 0:
+                        print(f"{code}: {status_counts[code]}")
+
         if line_count == 10:
             print(f"File size: {total_size}")
             for code in sorted(status_counts.keys()):
