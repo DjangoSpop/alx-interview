@@ -1,58 +1,63 @@
 #!/usr/bin/python3
-"""
-This script reads from stdin, line by line, and computes metrics based on the log entries.
-Each log must follow the format: <IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
-If the format does not match, the line is skipped. Metrics are printed after every valid log entry and upon interruption (CTRL + C).
-"""
-
 import sys
 import re
 
-# Regex pattern to match the log format
-pattern = re.compile(r'^\d{1,3}(\.\d{1,3}){3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] "GET /projects/260 HTTP/1\.1" (\d{3}) (\d+)$')
+def parse_line(line):
+    """
+    Parse a log line and extract the status code and file size.
 
-# Valid status codes as a set for quick lookup
-valid_status_codes = {"200", "301", "400", "401", "403", "404", "405", "500"}
+    Args:
+        line (str): The log line to parse.
 
-# Dictionary to count occurrences of status codes
-status_code_counts = {}
-# Total file size
-total_file_size = 0
-# Line count
-line_count = 0
+    Returns:
+        dict: A dictionary containing the status code and file size if the line is valid,
+              otherwise None.
+    """
+    pattern = r'^(\d+\.\d+\.\d+\.\d+) - \[(.+)\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
+    match = re.match(pattern, line)
+    if match:
+        status_code = int(match.group(3))
+        file_size = int(match.group(4))
+        return {'status_code': status_code, 'file_size': file_size}
+    return None
 
-try:
-    for line in sys.stdin:
-        # Check if the line matches the required format
-        match = pattern.match(line)
-        if match:
-            # Extract status code and file size from the line
-            status_code = match.group(1)
-            file_size = int(match.group(2))
+def print_stats(total_size, status_counts):
+    """
+    Print the total file size and the count of each status code.
 
-            # Check if the status code is one of the valid codes
-            if status_code in valid_status_codes:
-                # Update total file size
-                total_file_size += file_size
-                # Update count of the current status code
-                if status_code in status_code_counts:
-                    status_code_counts[status_code] += 1
-                else:
-                    status_code_counts[status_code] = 1
+    Args:
+        total_size (int): The total file size.
+        status_counts (dict): A dictionary containing the count of each status code.
+    """
+    print(f"File size: {total_size}")
+    for code in sorted(status_counts.keys()):
+        if status_counts[code] > 0:
+            print(f"{code}: {status_counts[code]}")
 
-                # Print the statistics after processing each valid line
-                print('File size:', total_file_size)
-                for code in sorted(status_code_counts):
-                    print(f"{code}: {status_code_counts[code]}")
-except KeyboardInterrupt:
-    # Handle CTRL + C interruption: print the current statistics
-    print('File size:', total_file_size)
-    for code in sorted(status_code_counts):
-        print(f"{code}: {status_code_counts[code]}")
-    sys.exit("Interrupted by user")
+def main():
+    """
+    The main function that reads log lines from stdin, parses them, and prints statistics.
+    """
+    total_size = 0
+    status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+    line_count = 0
 
-# After exiting the loop (end of input), also print the statistics if needed
-if line_count > 0:
-    print('File size:', total_file_size)
-    for code in sorted(status_code_counts):
-        print(f"{code}: {status_code_counts[code]}")
+    try:
+        for line in sys.stdin:
+            parsed = parse_line(line)
+            if parsed:
+                status_code = parsed['status_code']
+                file_size = parsed['file_size']
+                total_size += file_size
+                status_counts[status_code] += 1
+                line_count += 1
+
+            if line_count == 10:
+                print_stats(total_size, status_counts)
+                line_count = 0
+
+    except KeyboardInterrupt:
+        print_stats(total_size, status_counts)
+
+if __name__ == "__main__":
+    main()
