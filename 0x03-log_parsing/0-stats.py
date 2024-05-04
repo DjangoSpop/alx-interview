@@ -48,10 +48,13 @@ try:
             if status_code in {"200", "301", "400", "401", "403", "404", "405", "500"}:
                 status_codes_count[status_code] += 1
             log_count += 1
-
             # Print stats after each valid log is processed
             print_stats(total_size, status_codes_count)
 
 except KeyboardInterrupt:
     print_stats(total_size, status_codes_count)
     sys.exit("Interrupted by user")
+
+# Print final stats if any logs were processed
+if log_count > 0:
+    print_stats(total_size, status_codes_count)
