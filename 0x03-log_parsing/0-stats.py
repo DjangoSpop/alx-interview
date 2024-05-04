@@ -1,41 +1,74 @@
 #!/usr/bin/python3
-"""Log Parsing
-Write a script that reads stdin line by line and computes metrics:
+"""
+Log stats module
 """
 import sys
+from operator import itemgetter
 
 
-total_file_size = 0
-status = ['200', '301', '400', '401', '403', '404', '405', '500']
-obj = dict.fromkeys(status, 0)
+def log_parser(log):
+    """
+    Parses log into different fields
+    """
+    log_fields = log.split()
+    file_size = int(log_fields[-1])
+    status_code = log_fields[-2]
+    return status_code, file_size
 
 
-def printLogStat():
-    """Print log statistics"""
-    print("File size: {}".format(total_file_size))
-    for key, value in sorted(obj.items()):
-        if value > 0:
-            print("{}: {}".format(key, value))
+def validate_format(log):
+    """
+    Validates log format
+    """
+    return False if len(log.split()) < 7 else True
 
 
-if __name__ == "__main__":
-    count = 0
+def validate_status_code(status_code):
+    """
+    Check if status code entry is valid
+    """
+    valid_status_codes = ["200", "301", "400", "401",
+                          "403", "404", "405", "500"]
+    return True if status_code in valid_status_codes else False
+
+
+def print_log(file_size, status_codes) -> None:
+    """
+    Prints out log files
+    """
+    sorted_status_codes = sorted(status_codes.items(), key=itemgetter(0))
+    print('File size: {}'.format(file_size))
+    for code_count in sorted_status_codes:
+        key = code_count[0]
+        value = code_count[1]
+        print("{}: {}".format(key, value))
+
+
+def main():
+    """
+    Reads logs from std in and prints out statistic
+    on status code and file size
+    """
+    status_codes_count = {}
+    total_size = 0
+    log_count = 0
     try:
-        for line in sys.stdin:
-            line = line.split()
-            count += 1
-            try:
-                total_file_size += int(line[-1])
-
-                if line[-2] in status:
-                    obj[line[-2]] += 1
-
-            except (IndexError, ValueError):
-                pass
-
-            if count % 10 == 0:
-                printLogStat()
+        for log in sys.stdin:
+            log_count += 1
+            if not validate_format(log):
+                continue
+            status_code, file_size = log_parser(log)
+            total_size += file_size
+            if validate_status_code(status_code):
+                entry = {status_code:
+                         status_codes_count.get(status_code, 0) + 1}
+                status_codes_count.update(entry)
+            if not log_count % 10:
+                print_log(total_size, status_codes_count)
     except KeyboardInterrupt:
-        pass
-    finally:
-        printLogStat()
+        print_log(total_size, status_codes_count)
+    print_log(total_size, status_codes_count)
+
+
+if __name__ == '__main__':
+    main()
