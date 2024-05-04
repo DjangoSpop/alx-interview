@@ -2,8 +2,12 @@
 """
 Log parsing
 """
-
 import sys
+import os
+
+if not os.path.isatty(0):
+    sys.stdin.seek(0)
+
 
 if __name__ == '__main__':
 
@@ -11,7 +15,16 @@ if __name__ == '__main__':
     codes = ["200", "301", "400", "401", "403", "404", "405", "500"]
     stats = {k: 0 for k in codes}
 
-    def print_stats(stats: dict, file_size: int) -> None:
+    def print_stats(stats: dict) -> None:
+        """
+        Print the statistics from the given dictionary.
+
+        Args:
+            stats (dict): A dictionary containing the statistics.
+
+        Returns:
+            None
+        """
         print("File size: {:d}".format(filesize))
         for k, v in sorted(stats.items()):
             if v:
