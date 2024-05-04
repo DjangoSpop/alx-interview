@@ -1,8 +1,9 @@
+#!/usr/bin/python3
 import sys
 import re
 from collections import defaultdict
 
-#!/usr/bin/python3
+
 """
 Log stats module
 This script reads from stdin line by line and computes metrics such as total file size
