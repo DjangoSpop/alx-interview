@@ -51,5 +51,6 @@ if __name__ == '__main__':
             print('File size:', filesize + sum(stats.values()))
     print_stats(stats, filesize)
     for code, count in stats.items():
-        if count > 0:
+        if count > 0 and code == "200":
             print(f"Status code {code}: {count}")
+   
