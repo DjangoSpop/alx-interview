@@ -1,39 +1,50 @@
 #!/usr/bin/python3
 """
-This script reads log lines from stdin, computes metrics,
-and prints statistics every 10 lines or on keyboard interruption.
+Log parsing
 """
-
-import sys
 import re
+import sys
+"""
+we can create a fucnction
+to make a log parsing script
+"""
+if __name__ == '__main__':
 
-total_size = 0
-status_counts = {
-    200: 0, 301: 0, 400: 0, 401: 0,
-    403: 0, 404: 0, 405: 0, 500: 0
-}
-line_count = 0
+    filesize, count = 0, 0
+    status_codes = ["200", "301", "400", "401", "403", "404", "405", "500"]
+    stats = {k: 0 for k in codes}
+    pattern = r'<IP Adress> - \[\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2}  [-+]\d{4})\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)'
+    
+        """
+        Print the statistics from the given dictionary.
 
-try:
-    for line in sys.stdin:
-        pattern = r'^(\d+\.\d+\.\d+\.\d+) - \[(.+)\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)$'  # noqa: E501
-        match = re.match(pattern, line)
-        if match:
-            status_code = int(match.group(3))
-            file_size = int(match.group(4))
+        Args:
+            stats (dict): A dictionary containing the statistics.
 
-            total_size += file_size
-            status_counts[status_code] += 1
-            line_count += 1
-
-        if line_count == 10 :
-            print(f"{code} : {total_size}")
-            for code in sorted(status_counts.keys()):
-                if status_counts[code] > 0:
-                    print(f"{code}: {status_counts[code]}")
-
-except KeyboardInterrupt:
-    print(f"File size: {total_size}")
-    for code in sorted(status_counts.keys()):
-        if status_counts[code] > 0:
-            print(f"{code}: {status_counts[code]}")
+        Returns:
+            None
+        """
+        
+    try:
+        for line in sys.stdin :
+            count += 1
+            data = line.split()
+             match = re.search(pattern, line)
+            if match:
+                date, status_code, file_size = match.groups()    
+            try:
+                status_code = data[-2]
+                if status_code in stats:
+                    stats[status_code] += 1
+            except BaseException:
+                pass
+            try:
+                filesize += int(data[-1])
+            except BaseException:
+                pass
+            if count % 10 == 0:
+                print_stats(status_code, filesize)
+        print_stats(stats, filesize)
+    except KeyboardInterrupt:
+        print_stats(stats, filesize)
+        raise
