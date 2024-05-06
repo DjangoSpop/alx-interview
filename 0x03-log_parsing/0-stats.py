@@ -3,10 +3,10 @@
 A script that reads stdin line by line and computes metrics.
 """
 
-import sys
-import re
-
 # Dictionary to store the count of each status code
+import re
+import sys
+
 status_counts = {
     '200': 0, '301': 0, '400': 0, '401': 0,
     '403': 0, '404': 0, '405': 0, '500': 0
@@ -33,14 +33,14 @@ try:
 
         # Print statistics after every 10 lines or on keyboard interruption
         if line_count == 10 or line_count == 1:
-            print(f"File size: {total_size}")
+            print(f"Total file size: {total_size}")
             for code in sorted(status_counts.keys()):
                 if status_counts[code] > 0:
                     print(f"{code}: {status_counts[code]}")
             line_count = 0
 
 except KeyboardInterrupt:
-    print(f"File size: {total_size}")
+    print(f"Total file size: {total_size}")
     for code in sorted(status_counts.keys()):
         if status_counts[code] > 0:
             print(f"{code}: {status_counts[code]}")
