@@ -31,8 +31,8 @@ try:
                 status_counts[status_code] += 1
             line_count += 1
 
-        # Print statistics after every 10 lines or on keyboard interruption
-        if line_count == 10 or line_count == 1:
+        # Print statistSics after every 10 lines or on keyboard interruption
+        if line_count == 10:
             print(f"Total file size: {total_size}")
             for code in sorted(status_counts.keys()):
                 if status_counts[code] > 0:
