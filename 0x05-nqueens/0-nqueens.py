@@ -1,59 +1,88 @@
-import sys
+"""check_arguments()
+initialize_board()
+solve_nqueens(board, column=0)
 
-def is_safe(board, row, col, n):
-    # Check this row on the left side
-    for i in range(col):
-        if board[row][i] == 1:
-            return False
-
-    # Check the upper diagonal on the left side
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
-    # Check the lower diagonal on the left side
-    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
-    return True
-
-def solve_nqueens(board, col, n):
-    # Base case: If all queens are placed, return True
-    if col == n:
-        print(soln)
+function solve_nqueens(board, column):
+    if column == N:
+        print_solution(board)
         return
 
-    # Consider this column and try placing this queen in all rows one by one
-    for i in range(n):
-        if is_safe(board, i, col, n):
-            # Place this queen in board[i][col]
-            board[i][col] = 1
-            soln[col] = [i, col]
+    for row in range(N):
+        if is_safe(board, row, column):
+            place_queen(board, row, column)
+            solve_nqueens(board, column + 1)
+            remove_queen(board, row, column)
 
-            # Recur to place rest of the queens
-            solve_nqueens(board, col + 1, n)
+function is_safe(board, row, column):
+    check if there are any queens in the same row, column, or diagonals
+    return True if the position is safe, False otherwise
 
-            # If placing queen in board[i][col] doesn't lead to a solution, remove the queen
-            board[i][col] = 0
-            soln[col] = [-1, -1]
+function place_queen(board, row, column):
+    mark the position (row, column) as occupied on the board
 
-if __name__ == "__main__":
+function remove_queen(board, row, column):
+    mark the position (row, column) as unoccupied on the board
+
+function print_solution(board):
+    print the solution in the required format"""
+import sys 
+def check_arguments():
+    """Check the number of arguments"""
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
-
     try:
-        n = int(sys.argv[1])
+        N = int(sys.argv[1])
     except ValueError:
         print("N must be a number")
         sys.exit(1)
-
-    if n < 4:
+    if N < 4:
         print("N must be at least 4")
         sys.exit(1)
+    return N
+def initialize_board():
+    """Initialize the board"""
+    N = check_arguments()
+    board = [[0 for i in range(N)] for j in range(N)]
+    return board
+def is_safe(board, row, column):
+    """Check if a queen can be placed on board[row][column]"""
+    N = len(board)
+    for i in range(column):
+        if board[row][i] == 1:
+            return False
+    for i, j in zip(range(row, -1, -1), range(column, -1, -1)):
+        if board[i][j] == 1:
+            return False
+    for i, j in zip(range(row, N, 1), range(column, -1, -1)):
+        if board[i][j] == 1:
+            return False
+    return True
+def solve_nqueens(board, column = 0):
+    """Solve the N queens problem"""
+    N = len(board)
+    if column == N:
+        print_solution(board)
+        return
+    for row in range(N):
+        if is_safe(board, row, column):
+            place_queen(board, row, column)
+            solve_nqueens(board, column + 1)
+            remove_queen(board, row, column)
+def place_queen(board, row , column):
+    """Place a queen on board[row][column]"""
+    board[row][column] = 1
+def remove_queen(board, row, column):
+    """Remove a queen from board[row][column]"""
+    board[row][column] = 0
+def print_solution(board):
+    """Print the solution in the required format"""
+    N = len(board)
+    result = []
+    for row in range(N):
+        for column in range(N):
+            if board[row][column] == 1:
+                result.append([row, column])
+    print(result)
 
-    board = [[0 for _ in range(n)] for _ in range(n)]
-    soln = [[-1, -1] for _ in range(n)]
-
-    solve_nqueens(board, 0, n)
+    
