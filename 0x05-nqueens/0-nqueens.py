@@ -112,3 +112,4 @@ def nqueens(n):
 
 if __name__ == "__main__":
     nqueens(sys.argv[1])
+    
