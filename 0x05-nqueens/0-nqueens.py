@@ -1,28 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import sys
-"""A module that make back tracking and nqueens"""
-def check_arguments():
-    """Check the command line arguments"""
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
 
-    try:
-        N = int(sys.argv[1])
-    except ValueError:
-        print("N must be a number")
-        sys.exit(1)
-    
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-    
-    return N
 
-N = check_arguments()
-board = [[0 for _ in range(N)] for _ in range(N)]
 def print_solution(board):
-    """Print the board configuration"""
+    """Print the board configuration in the desired format"""
     solution = []
     for row in range(len(board)):
         for col in range(len(board)):
