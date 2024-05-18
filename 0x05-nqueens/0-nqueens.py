@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 """A module that make back tracking and nqueens"""
 def print_solution(board):
