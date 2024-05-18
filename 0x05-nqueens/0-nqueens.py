@@ -4,6 +4,36 @@ This module contains a function that solves the N Queens problem.
 """
 import sys
 
+def nqueens(n):
+    """
+    Entry point for the N Queens problem.
+
+    Args:
+        n (int or str): The size of the board.
+
+    Prints the solutions to the N Queens problem, if any.
+    """
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
+
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    solutions = solve_nqueens(n)
+    for solution in solutions:
+        print(solution)
+
+
+if __name__ == "__main__":
+    nqueens(sys.argv[1])
 
 def is_safe(board, row, col, n):
     """
@@ -80,36 +110,4 @@ def solve_nqueens(n):
 
     solve(0)
     return solutions
-
-
-def nqueens(n):
-    """
-    Entry point for the N Queens problem.
-
-    Args:
-        n (int or str): The size of the board.
-
-    Prints the solutions to the N Queens problem, if any.
-    """
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
-
-    try:
-        n = int(sys.argv[1])
-    except ValueError:
-        print("N must be a number")
-        sys.exit(1)
-
-    if n < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-
-    solutions = solve_nqueens(n)
-    for solution in solutions:
-        print(solution)
-
-
-if __name__ == "__main__":
-    nqueens(sys.argv[1])
-    
+ 
