@@ -3,6 +3,10 @@
 on a NxN chessboard
 This program solves the N queens problem """
 
+""" N queens puzzle, challenge of placing N non-attacking queens
+on a NxN chessboard
+This program solves the N queens problem """
+
 from sys import argv, exit
 
 
@@ -43,5 +47,6 @@ if __name__ == "__main__":
         print('N must be at least 4')
         exit(1)
     else:
-        solve_NQueens(N, 0, [], [])
-
+        output = []
+        cell = 0
+        solve_NQueens(N, 0, [], output)
