@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""N Queens Module"""
+"""N Queens Solver"""
 
 import sys
 
@@ -15,7 +15,25 @@ def is_NQueen(cell):
     return True
 
 
-def solve_NQueens(dimension, row, cell, output):
+if len(sys.argv) != 2:
+    print('Usage: nqueens N')
+    sys.exit(1)
+
+try:
+    N = int(sys.argv[1])
+except ValueError:
+    print('N must be a number')
+    sys.exit(1)
+
+if N < 4:
+    print('N must be at least 4')
+    sys.exit(1)
+
+output = []
+cell = 0
+dimension = N
+
+def solve_NQueens(row):
     """Solve the N queens problem recursively."""
     if row == dimension:
         print(output)
@@ -24,30 +42,7 @@ def solve_NQueens(dimension, row, cell, output):
             cell.append(column)
             if is_NQueen(cell):
                 output.append([row, column])
-                solve_NQueens(dimension, row + 1, cell, output)
+                solve_NQueens(row + 1)
                 output.pop()
             cell.pop()
 
-
-def main():
-    """Main function to handle command line arguments."""
-    if len(sys.argv) != 2:
-        print('Usage: nqueens N')
-        sys.exit(1)
-    try:
-        N = int(sys.argv[1])
-    except ValueError:
-        print('N must be a number')
-        sys.exit(1)
-    if N < 4:
-        print('N must be at least 4')
-        sys.exit(1)
-    else:
-        output = []
-        cell = 0
-        solve_NQueens(N, 0, [], output)
-
-
-if __name__ == "__main__":
-    main()
-    
