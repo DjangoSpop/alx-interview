@@ -3,48 +3,53 @@
 on a NxN chessboard
 This program solves the N queens problem """
 
-from sys import argv
-
-
-def is_NQueen(cell: list) -> bool:
-    """ False if not N Queen, True if N Queen """
-    row_number = len(cell) - 1
-    difference = 0
-    for index in range(0, row_number):
-        difference = cell[index] - cell[row_number]
-        if difference < 0:
-            difference *= -1
-        if difference == 0 or difference == row_number - index:
+def is_safe(board, row, col, n):
+    # Check this row on left side
+    for i in range(col):
+        if board[row][i] == 1:
             return False
+
+    # Check upper diagonal on left side
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Check lower diagonal on left side
+    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
     return True
 
+def solve_nqueens_util(board, col, n):
+    # base case: If all queens are placed
+    if col >= n:
+        return True
 
-def solve_NQueens(dimension: int, row: int, cell: list, output: list):
-    """ Return result of N Queens recursively """
-    if row == dimension:
-        print(output)
-    else:
-        for column in range(0, dimension):
-            cell.append(column)
-            output.append([row, column])
-            if (is_NQueen(cell)):
-                solve_NQueens(dimension, row + 1, cell, output)
-            cell.pop()
-            output.pop()
+    # Consider this column and try placing this queen in all rows one by one
+    for i in range(n):
+        if is_safe(board, i, col, n):
+            # Place this queen in board[i][col]
+            board[i][col] = 1
 
+            # Recur to place rest of the queens
+            if solve_nqueens_util(board, col + 1, n):
+                return True
 
-if len(argv) != 2:
-    print('Usage: nqueens N')
-    exit(1)
-try:
-    N = int(argv[1])
-except BaseException:
-    print('N must be a number')
-    exit(1)
-if N < 4:
-    print('N must be at least 4')
-    exit(1)
-else:
-    output = []
-    cell = 0
-    solve_NQueens(int(N), cell, [], output)
+            # If placing queen in board[i][col] doesn't lead to a solution
+            # then remove queen from board[i][col]
+            board[i][col] = 0  # BACKTRACK
+
+    # If the queen cannot be placed in any row in this column, then return false
+    return False
+
+def solve_nqueens(n):
+    board = [[0] * n for _ in range(n)]
+    if not solve_nqueens_util(board, 0, n):
+        print("Solution does not exist")
+        return False
+
+    # Print the solution
+    for row in board:
+        print(" ".join(str(x) for x in row))
+    return True
