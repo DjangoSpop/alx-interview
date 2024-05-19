@@ -1,34 +1,35 @@
 #!/usr/bin/python3
-"""N Queens placement on NxN chessboard"""
-
+"""N Queens placement on NxN chessboard."""
 
 import sys
 
 
 def generate_solutions(row, column):
-    """
-    solve a simple N x N matrix
+    """Solve a simple N x N matrix.
+
     Args:
-        row (int): Number of rows
-        column (int): Number of columns
+        row (int): Number of rows.
+        column (int): Number of columns.
+
     Returns:
-        returns a list of lists
+        list: A list of lists representing the solutions.
     """
-    solution = [[]]
+    solution = []
     for queen in range(row):
         solution = place_queen(queen, column, solution)
     return solution
 
 
 def place_queen(queen, column, prev_solution):
-    """
-    Place the queen at a certain position
+    """Place the queen at a certain position.
+
     Args:
-        queen (int): The queen
-        column (int): The column to move
-        prev_solution (list): the previous move
+        queen (int): The row index of the queen.
+        column (int): The column to move.
+        prev_solution (list): The previous solution.
+
     Returns:
-        returns a list
+        list: A list of safe positions for the queen.
     """
     safe_position = []
     for array in prev_solution:
@@ -40,28 +41,30 @@ def place_queen(queen, column, prev_solution):
 
 def is_safe(q, x, array):
     """
-    check if it's safe to make a move
+    Check if it's safe to make a move.
+
     Args:
-        q (int): row to move to
-        x (int): column to move to
-        array (array): the matrix
+        q (int): The row index of the queen.
+        x (int): The column index of the queen.
+        array (list): The current solution.
+
     Returns:
-        returns a boolean
+        bool: True if the position is safe, False otherwise.
     """
     if x in array:
-        return (False)
+        return False
     else:
-        return all(abs(array[column] - x) != q - column
-                   for column in range(q))
+        return all(abs(array[column] - x) != q - column for column in range(q))
 
 
 def init():
-    """
-    Lets initialize the game shall we?
+    """Initialize the game.
+
     Args:
-        this function doesn't take any args
+        None
+
     Returns:
-        returns an integer
+        int: The value of N for the NxN chessboard.
     """
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
@@ -74,18 +77,17 @@ def init():
     if n < 4:
         print("N must be at least 4")
         sys.exit(1)
-    return (n)
+    return n
 
 
 def n_queens():
-    """
-    The main entry point
+    """Entry point for the N-Queens problem solver.
+
     Args:
-        can be called without passing args
+        None
+
     Returns:
-        returns None
-    Example
-    -----------------------
+        None
     """
     n = init()
     solutions = generate_solutions(n, n)
@@ -98,4 +100,3 @@ def n_queens():
 
 if __name__ == '__main__':
     n_queens()
-    
