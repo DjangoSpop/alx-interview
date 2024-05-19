@@ -1,90 +1,53 @@
-811#!/usr/bin/python3
-"""Defines a function to solve the N-Queens problem"""
+#!/usr/bin/python3
+
+"""N Queens Module"""
+
 import sys
 
 
-def is_safe(board, row, col, n):
-    """
-    Check if a queen can be placed on board[row][col]
-    """
-    # Check this row on the left side
-    for i in range(col):
-        if board[row][i] == 1:
+def is_NQueen(cell):
+    """Check if the queen in the given cell is safe."""
+    row_number = len(cell) - 1
+    for index in range(row_number):
+        difference = abs(cell[index] - cell[row_number])
+        if difference == 0 or difference == row_number - index:
             return False
-
-    # Check upper diagonal on the left side
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
-    # Check lower diagonal on the left side
-    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
     return True
 
 
-def solve_nqueens(n):
-    """
-    Solve the N-Queens problem using backtracking
-    """
-    board = [[0 for _ in range(n)] for _ in range(n)]
-    solutions = []
-
-    def solve(board, col):
-        """
-        Recursive helper function to solve the N-Queens problem
-        """
-        # Base case: If all queens are placed, add the solution to the list
-        if col == n:
-            solution = []
-            for row in board:
-                solution.append("".join(map(str, row)).replace("0", ".").replace("1", "Q"))
-            solutions.append(solution)
-            return
-
-        # Place this queen in all rows one by one
-        for row in range(n):
-            if is_safe(board, row, col, n):
-                board[row][col] = 1
-
-                # Recur to place rest of the queens
-                solve(board, col + 1)
-
-                # If placing queen in board[row][col] doesn't lead to a solution,
-                # remove the queen
-                board[row][col] = 0
-
-    solve(board, 0)
-    return solutions
+def solve_NQueens(dimension, row, cell, output):
+    """Solve the N queens problem recursively."""
+    if row == dimension:
+        print(output)
+    else:
+        for column in range(dimension):
+            cell.append(column)
+            if is_NQueen(cell):
+                output.append([row, column])
+                solve_NQueens(dimension, row + 1, cell, output)
+                output.pop()
+            cell.pop()
 
 
-def nqueens(argv):
-    """
-    Entry point for the N-Queens problem solver
-    """
-    if len(argv) != 2:
-        print("Usage: nqueens N")
-        return 1
-
+def main():
+    """Main function to handle command line arguments."""
+    if len(sys.argv) != 2:
+        print('Usage: nqueens N')
+        sys.exit(1)
     try:
-        n = int(argv[1])
+        N = int(sys.argv[1])
     except ValueError:
-        print("N must be a number")
-        return 1
-
-    if n < 4:
-        print("N must be at least 4")
-        return 1
-
-    solutions = solve_nqueens(n)
-    for solution in solutions:
-        print("\n".join(solution))
-
-    return 0
+        print('N must be a number')
+        sys.exit(1)
+    if N < 4:
+        print('N must be at least 4')
+        sys.exit(1)
+    else:
+        output = []
+        cell = 0
+        solve_NQueens(N, 0, [], output)
 
 
 if __name__ == "__main__":
-    exit(nqueens(sys.argv))
-
+    main()
+    
