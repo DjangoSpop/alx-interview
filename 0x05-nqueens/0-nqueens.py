@@ -5,16 +5,6 @@
 import sys
 
 
-def is_NQueen(cell):
-    """Check if the queen in the given cell is safe."""
-    row_number = len(cell) - 1
-    for index in range(row_number):
-        difference = abs(cell[index] - cell[row_number])
-        if difference == 0 or difference == row_number - index:
-            return False
-    return True
-
-
 if len(sys.argv) != 2:
     print('Usage: nqueens N')
     sys.exit(1)
@@ -28,6 +18,17 @@ except ValueError:
 if N < 4:
     print('N must be at least 4')
     sys.exit(1)
+
+"""Implementation of the N Queens Solver"""
+
+def is_NQueen(cell):
+    """Check if the queen in the given cell is safe."""
+    row_number = len(cell) - 1
+    for index in range(row_number):
+        difference = abs(cell[index] - cell[row_number])
+        if difference == 0 or difference == row_number - index:
+            return False
+    return True
 
 output = []
 cell = 0
