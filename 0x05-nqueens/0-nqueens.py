@@ -3,8 +3,6 @@
 on a NxN chessboard
 This program solves the N queens problem """
 """
-Solution to the nqueens problem
-"""
 import sys
 
 
