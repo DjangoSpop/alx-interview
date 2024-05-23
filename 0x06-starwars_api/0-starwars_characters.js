@@ -21,7 +21,7 @@ request(apiUrl, function (error, response, body) {
   }
 });
 
-function printCharacters(urls) {
+function printCharacters (urls) {
   urls.forEach(function (url) {
     request(url, function (error, response, body) {
       if (!error && response.statusCode === 200) {
