@@ -1,43 +1,30 @@
-#!/usr/bin/env node
+#!/usr/bin/node
 
 const request = require('request');
 
-if (process.argv.length !== 3) {
-  console.error('Usage: ./0-starwars_characters.js <Movie ID>');
+
+if (process.argv.length <= 2) {
+  console.log('Usage: ./0-starwars_characters.js [MovieID]');
   process.exit(1);
 }
 
 const movieId = process.argv[2];
-const url = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
+const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
-request(url, (error, response, body) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  if (response.statusCode !== 200) {
-    console.error(`Error: ${response.statusCode}`);
-    return;
-  }
-
-  const film = JSON.parse(body);
-  const characters = film.characters;
-
-  characters.forEach(characterUrl => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      if (response.statusCode !== 200) {
-        console.error(`Error: ${response.statusCode}`);
-        return;
-      }
-
-      const character = JSON.parse(body);
-      console.log(character.name);
+request(apiUrl, function (error, response, body) {
+  if (!error && response.statusCode === 200) {
+    const movie = JSON.parse(body);
+    const characters = movie.characters;
+    characters.forEach(function (url) {
+      request(url, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          const character = JSON.parse(body);
+          console.log(character.name);
+        }
+      });
     });
-  });
+  } else {
+    console.error(`Error: ${error || response.statusCode}`);
+  }
+  
 });
