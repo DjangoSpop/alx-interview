@@ -7,7 +7,7 @@ if (process.argv.length <= 2) {
   process.exit(1);
 }
 
-const movieId = process.argv[2];
+const movieId = process.argv[3];
 const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
 request(apiUrl, function (error, response, body) {
