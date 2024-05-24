@@ -25,4 +25,5 @@ request(apiUrl, function (error, response, body) {
   } else {
     console.error(`Error: ${error || response.statusCode}`);
   }
+console.log(movie.title);
 });
