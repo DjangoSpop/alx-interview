@@ -22,9 +22,11 @@ const getCharNames = async () => {
       names.push(characterData.name);
     }
 
-    names.forEach((name, index) => {
-      process.stdout.write(name + (index < names.length - 1 ? '\n' : ''));
-    });
+    if (names.length > 0) {
+      console.log('OK');
+    } else {
+      console.error('Error: No characters found');
+    }
   } catch (error) {
     console.error('Error: ', error);
   }
