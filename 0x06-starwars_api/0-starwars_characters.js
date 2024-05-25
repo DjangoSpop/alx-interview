@@ -2,12 +2,6 @@
 
 const request = require('request');
 
-
-if (process.argv.length <= 2) {
-  console.log('Usage: ./0-starwars_characters.js [MovieID]');
-  process.exit(1);
-}
-
 const movieId = process.argv[2];
 const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
