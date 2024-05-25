@@ -1,49 +1,52 @@
 #!/usr/bin/node
+
 const request = require('request');
 
 const movieId = process.argv[2];
-const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
+const filmEndPoint = 'https://swapi-api.hbtn.io/api/films/' + movieId;
+let people = [];
+const names = [];
 
-if (!movieId) {
-  console.error('Usage: ./0-starwars_characters.js <MovieID>');
-  process.exit(1);
-}
+const requestCharacters = async () => {
+  await new Promise(resolve => request(filmEndPoint, (err, res, body) => {
+    if (err || res.statusCode !== 200) {
+      console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+    } else {
+      const jsonBody = JSON.parse(body);
+      people = jsonBody.characters;
+      resolve();
+    }
+  }));
+};
+
+const requestNames = async () => {
+  if (people.length > 0) {
+    for (const p of people) {
+      await new Promise(resolve => request(p, (err, res, body) => {
+        if (err || res.statusCode !== 200) {
+          console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+        } else {
+          const jsonBody = JSON.parse(body);
+          names.push(jsonBody.name);
+          resolve();
+        }
+      }));
+    }
+  } else {
+    console.error('Error: Got no Characters for some reason');
+  }
+};
 
 const getCharNames = async () => {
-  try {
-    request(filmEndPoint, (err, res, body) => {
-      if (err || res.statusCode !== 200) {
-        console.error('Error:', err || `StatusCode: ${res.statusCode}`);
-        return;
-      }
-      const filmData = JSON.parse(body);
-      const characters = filmData.characters;
+  await requestCharacters();
+  await requestNames();
 
-      if (!characters || characters.length === 0) {
-        console.error('Error: Got no Characters for some reason');
-        return;
-      }
-
-      const names = [];
-      let count = 0;
-
-      characters.forEach(characterUrl => {
-        request(characterUrl, (err, res, body) => {
-          if (err || res.statusCode !== 200) {
-            console.error('Error:', err || `StatusCode: ${res.statusCode}`);
-            return;
-          }
-          const characterData = JSON.parse(body);
-          names.push(characterData.name);
-          count++;
-          if (count === characters.length) {
-            names.forEach(name => console.log(name));
-          }
-        });
-      });
-    });
-  } catch (error) {
-    console.error('Error:', error);
+  for (const n of names) {
+    if (n === names[names.length - 1]) {
+      process.stdout.write(n);
+    } else {
+      process.stdout.write(n + '\n');
+    }
   }
 };
 
