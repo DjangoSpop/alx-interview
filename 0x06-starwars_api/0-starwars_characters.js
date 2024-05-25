@@ -5,6 +5,11 @@ const request = require('request');
 const movieId = process.argv[2];
 const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
 
+if (!movieId) {
+  console.error('Usage: ./0-starwars_characters.js <MovieID>');
+  process.exit(1);
+}
+
 const getCharNames = async () => {
   try {
     request(filmEndPoint, (err, res, body) => {
