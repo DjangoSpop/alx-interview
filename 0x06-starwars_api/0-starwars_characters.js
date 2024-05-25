@@ -1,57 +1,32 @@
-#!/usr/bin/env node
+#!/usr/bin/node
 
-const request = require('request');
+const fetch = require('node-fetch');
 
 const movieId = process.argv[2];
-const filmEndPoint = 'https://swapi-api.hbtn.io/api/films/' + movieId;
-let people = [];
-const names = [];
-
-const requestCharacters = () => {
-  return new Promise((resolve, reject) => {
-    request(filmEndPoint, (err, res, body) => {
-      if (err || res.statusCode !== 200) {
-        reject(`Error: ${err} | StatusCode: ${res.statusCode}`);
-      } else {
-        const jsonBody = JSON.parse(body);
-        people = jsonBody.characters;
-        resolve();
-      }
-    });
-  });
-};
-
-const requestNames = () => {
-  const namePromises = people.map(p => {
-    return new Promise((resolve, reject) => {
-      request(p, (err, res, body) => {
-        if (err || res.statusCode !== 200) {
-          reject(`Error: ${err} | StatusCode: ${res.statusCode}`);
-        } else {
-          const jsonBody = JSON.parse(body);
-          names.push(jsonBody.name);
-          resolve();
-        }
-      });
-    });
-  });
-
-  return Promise.all(namePromises);
-};
+const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
 
 const getCharNames = async () => {
   try {
-    await requestCharacters();
-    if (people.length > 0) {
-      await requestNames();
-      names.forEach((name, index) => {
-        process.stdout.write(name + (index < names.length - 1 ? '\n' : ''));
-      });
-    } else {
-      console.error('Error: Got no characters for some reason');
+    const filmResponse = await fetch(filmEndPoint);
+    const filmData = await filmResponse.json();
+
+    if (!filmData.characters) {
+      console.error('Error: Got no Characters for some reason');
+      return;
     }
+
+    const names = [];
+    for (const characterUrl of filmData.characters) {
+      const characterResponse = await fetch(characterUrl);
+      const characterData = await characterResponse.json();
+      names.push(characterData.name);
+    }
+
+    names.forEach((name, index) => {
+      process.stdout.write(name + (index < names.length - 1 ? '\n' : ''));
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Error: ', error);
   }
 };
 
