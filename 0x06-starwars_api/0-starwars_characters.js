@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const fetch = require('node-fetch');
 
@@ -10,20 +10,20 @@ const getCharNames = async () => {
     const filmResponse = await fetch(filmEndPoint);
     const filmData = await filmResponse.json();
 
-    if (!filmData.characters) {
+    if (!filmData.characters || filmData.characters.length === 0) {
       console.error('Error: Got no Characters for some reason');
       return;
     }
 
-    const names = [];
-    for (const characterUrl of filmData.characters) {
+    const names = await Promise.all(filmData.characters.map(async (characterUrl) => {
       const characterResponse = await fetch(characterUrl);
       const characterData = await characterResponse.json();
-      names.push(characterData.name);
-    }
+      return characterData.name;
+    }));
 
     if (names.length > 0) {
       console.log('OK');
+      names.forEach(name => console.log(name));
     } else {
       console.error('Error: No characters found');
     }
