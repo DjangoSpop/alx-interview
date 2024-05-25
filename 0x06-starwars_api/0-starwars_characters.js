@@ -1,34 +1,45 @@
 #!/usr/bin/env node
 
-const fetch = require('node-fetch');
+const request = require('request');
 
 const movieId = process.argv[2];
 const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
 
 const getCharNames = async () => {
   try {
-    const filmResponse = await fetch(filmEndPoint);
-    const filmData = await filmResponse.json();
+    request(filmEndPoint, (err, res, body) => {
+      if (err || res.statusCode !== 200) {
+        console.error('Error:', err || `StatusCode: ${res.statusCode}`);
+        return;
+      }
+      const filmData = JSON.parse(body);
+      const characters = filmData.characters;
 
-    if (!filmData.characters || filmData.characters.length === 0) {
-      console.error('Error: Got no Characters for some reason');
-      return;
-    }
+      if (!characters || characters.length === 0) {
+        console.error('Error: Got no Characters for some reason');
+        return;
+      }
 
-    const names = await Promise.all(filmData.characters.map(async (characterUrl) => {
-      const characterResponse = await fetch(characterUrl);
-      const characterData = await characterResponse.json();
-      return characterData.name;
-    }));
+      const names = [];
+      let count = 0;
 
-    if (names.length > 0) {
-      console.log('OK');
-      names.forEach(name => console.log(name));
-    } else {
-      console.error('Error: No characters found');
-    }
+      characters.forEach(characterUrl => {
+        request(characterUrl, (err, res, body) => {
+          if (err || res.statusCode !== 200) {
+            console.error('Error:', err || `StatusCode: ${res.statusCode}`);
+            return;
+          }
+          const characterData = JSON.parse(body);
+          names.push(characterData.name);
+          count++;
+          if (count === characters.length) {
+            names.forEach(name => console.log(name));
+          }
+        });
+      });
+    });
   } catch (error) {
-    console.error('Error: ', error);
+    console.error('Error:', error);
   }
 };
 
