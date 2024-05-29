@@ -1,4 +1,10 @@
+#!/usr/bin/python3
 def rotate_2d_matrix(matrix):
+    """_summary_
+
+    Args:
+        matrix (_type_): _description_
+    """    
     n = len(matrix)
     
     # Step 1: Transpose the matrix
