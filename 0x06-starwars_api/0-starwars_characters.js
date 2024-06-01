@@ -37,7 +37,7 @@ const getCharacters = async () => {
 
     if (!Array.isArray(charactersUrls)) {
       console.error('Invalid response format. "characters" is not an array.');
-      return;
+      process.exit(1);
     }
 
     const characterPromises = charactersUrls.map(characterUrl => {
@@ -50,6 +50,7 @@ const getCharacters = async () => {
     });
   } catch (err) {
     console.error('Error:', err);
+    process.exit(1);
   }
 };
 
