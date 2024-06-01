@@ -1,20 +1,51 @@
 #!/usr/bin/node
-const util = require('util');
-const request = util.promisify(require('request'));
-const filmID = process.argv[2];
 
-async function starwarsCharacters (filmId) {
-  const endpoint = 'https://swapi-api.hbtn.io/api/films/' + filmId;
-  let response = await (await request(endpoint)).body;
-  response = JSON.parse(response);
-  const characters = response.characters;
+const request = require('request');
 
-  for (let i = 0; i < characters.length; i++) {
-    const urlCharacter = characters[i];
-    let character = await (await request(urlCharacter)).body;
-    character = JSON.parse(character);
-    console.log(character.name);
+const movieId = process.argv[2];
+const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
+
+request.get(apiUrl, (err, response, body) => {
+  if (err) {
+    console.error('Error:', err);
+    return;
   }
-}
 
-starwarsCharacters(filmID);
+  try {
+    const filmData = JSON.parse(body);
+    const charactersUrls = filmData.characters;
+
+    if (!Array.isArray(charactersUrls)) {
+      console.error('Invalid response format. "characters" is not an array.');
+      return;
+    }
+
+    const characterPromises = charactersUrls.map(characterUrl => {
+      return new Promise((resolve, reject) => {
+        request.get(characterUrl, (err, _, body) => {
+          if (err) {
+            reject(err);
+          } else {
+            try {
+              resolve(JSON.parse(body).name);
+            } catch (parseError) {
+              reject(parseError);
+            }
+          }
+        });
+      });
+    });
+
+    Promise.all(characterPromises)
+      .then(characterNames => {
+        characterNames.forEach(name => {
+          console.log(name);
+        });
+      })
+      .catch(err => {
+        console.error('Error:', err);
+      });
+  } catch (parseError) {
+    console.error('Error parsing JSON:', parseError);
+  }
+});
