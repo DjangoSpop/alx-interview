@@ -1,10 +1,12 @@
 #!/usr/bin/python3
-"""Change making module."""
+"""Change making module using BFS."""
+
+from collections import deque
 
 
 def makeChange(coins, total):
     """
-    Determine the fewest number of coins needed to meet a given amount total.
+    Determine the fewest number of coins needed to meet a given amount.
 
     Args:
         coins (list): A list of the values of the coins in possession.
@@ -19,16 +21,19 @@ def makeChange(coins, total):
     if total <= 0:
         return 0
 
-    # Create an array to store the minimum number of coins for each value
-    min_coins = [float('inf')] * (total + 1)
-    min_coins[0] = 0
+    # Initialize a queue to hold the current amount and.
+    queue = deque([(0, 0)])  # (current amount, number of coins used)
+    visited = set()  # To keep track of visited amounts
 
-    for coin in coins:
-        if coin <= 0:
-            return -1
-        for i in range(coin, total + 1):
-            # Update the minimum number of coins required for each value
-            min_coins[i] = min(min_coins[i], min_coins[i - coin] + 1)
+    while queue:
+        current_amount, num_coins = queue.popleft()
 
-    # Return the minimum number of coins required to reach the total value
-    return min_coins[total] if min_coins[total] != float('inf') else -1
+        for coin in coins:
+            next_amount = current_amount + coin
+            if next_amount == total:
+                return num_coins + 1
+            if next_amount < total and next_amount not in visited:
+                visited.add(next_amount)
+                queue.append((next_amount, num_coins + 1))
+
+    return -1  # If we exhaust the queue without finding the total
