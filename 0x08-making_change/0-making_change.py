@@ -8,6 +8,7 @@ def makeChange(coins, total):
 
     Args:
         coins (list): A list of the values of the coins in possession.
+                      Each coin value is an integer greater than 0.
         total (int): The target amount to meet.
 
     Returns:
@@ -17,6 +18,11 @@ def makeChange(coins, total):
     """
     if total <= 0:
         return 0
+
+    # Check if all coin values are integers greater than 0
+    for coin in coins:
+        if not isinstance(coin, int) or coin <= 0:
+            return -1
 
     # Create an array to store the minimum number of coins for each value
     min_coins = [float('inf')] * (total + 1)
