@@ -3,19 +3,22 @@
 
 
 def makeChange(coins, total):
-    """_summary.
+    """
+    Determine the fewest number of coins needed to meet a given amount total.
 
     Args:
-        coins (_type_): _description_
-        total (_type_): _description_
+        coins (list): A list of the values of the coins in possession.
+        total (int): The target amount to meet.
 
     Returns:
-        _type_: _description_
-    """    
+        int: The fewest number of coins needed to meet the total.
+             Returns 0 if total is 0 or less.
+             Returns -1 if total cannot be met by any number of coins.
+    """
     if total <= 0:
         return 0
 
-    # Create an array to store the minimum number
+    # Create an array to store the minimum number of coins for each value
     min_coins = [float('inf')] * (total + 1)
     min_coins[0] = 0
 
