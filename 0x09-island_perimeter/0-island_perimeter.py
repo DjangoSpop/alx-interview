@@ -16,16 +16,8 @@ def island_perimeter(grid):
     for i in range(rows):
         for j in range(cols):
             if grid[i][j] == 1:  # Land cell
-                perimeter += 4  # Initialize perimeter with 4 (assuming no neighbors)
-
-                # Check and subtract shared edges with neighbors
-                if i > 0 and grid[i - 1][j] == 1:  # Top neighbor
-                    perimeter -= 2
-                if j > 0 and grid[i][j - 1] == 1:  # Left neighbor
-                    perimeter -= 2
-                if i < rows - 1 and grid[i + 1][j] == 1:  # Bottom neighbor
-                    perimeter -= 2
-                if j < cols - 1 and grid[i][j + 1] == 1:  # Right neighbor
-                    perimeter -= 2
+                # Count edges shared with water cells
+                perimeter += sum(grid[i][j] != grid[i][k] for k in (j-1, j+1) if 0 <= k < cols)
+                perimeter += sum(grid[i][j] != grid[k][j] for k in (i-1, i+1) if 0 <= k < rows)
 
     return perimeter
