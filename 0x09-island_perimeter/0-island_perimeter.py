@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# Description: Function that returns the perimeter of the island described in grid
 def island_perimeter(grid):
     """_summary_
 
@@ -8,7 +7,7 @@ def island_perimeter(grid):
 
     Returns:
         _type_: _description_
-    """    
+    """
     if not grid:
         return 0
 
