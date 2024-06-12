@@ -1,12 +1,18 @@
 #!/usr/bin/python3
+"""
+This module calculates the perimeter of an island in a grid.
+"""
+
+
 def island_perimeter(grid):
-    """_summary_
+    """
+    Calculate the perimeter of an island in a grid.
 
     Args:
-        grid (_type_): _description_
+        grid (List[List[int]]): A 2D grid representing the island.
 
     Returns:
-        _type_: _description_
+        int: The perimeter of the island.
     """
     if not grid:
         return 0
