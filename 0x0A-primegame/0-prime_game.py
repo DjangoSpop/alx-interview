@@ -1,36 +1,41 @@
 #!/usr/bin/python3
-from typing import List
-def is_prime(n):
-    if n < 2:
-        return False
-    for i in range(2, int(n ** 0.5) + 1):
-        if n % i == 0:
+def isWinner(x, nums):
+    def is_prime(num):
+        if num < 2:
             return False
-    return True
-def is_prime(n):
-    if n < 2:
-        return False
-    for i in range(2, int(n ** 0.5) + 1):
-        if n % i == 0:
-            return False
-    return True
+        for i in range(2, int(num ** 0.5) + 1):
+            if num % i == 0:
+                return False
+        return True
 
-def prime_game(n):
-    return 'Alice' if n % 2 == 0 else 'Bob' if is_prime(n) else 'Alice' 
-    
-def isWinner(x: int, nums: List[int]) -> str:
-    alice_wins = 0
-    bob_wins = 0
+    def play_game(n):
+        nums = set(range(1, n + 1))
+        player = 0
+        while True:
+            found_prime = False
+            for num in nums:
+                if is_prime(num):
+                    found_prime = True
+                    nums.remove(num)
+                    for multiple in range(num * 2, n + 1, num):
+                        nums.discard(multiple)
+                    break
+            if not found_prime:
+                return player
+            player = 1 - player
+
+    maria_wins = ben_wins = 0
     for n in nums:
-        if prime_game(n) == 'Alice':
-            alice_wins += 1
+        winner = play_game(n)
+        if winner == 0:
+            maria_wins += 1
         else:
-            bob_wins += 1
-    if alice_wins > bob_wins:
-        return 'Alice'
-    elif bob_wins > alice_wins:
-        return 'Bob'
+            ben_wins += 1
+
+    if maria_wins > ben_wins:
+        return "Maria"
+    elif ben_wins > maria_wins:
+        return "Ben"
     else:
         return None
-        pass
         
