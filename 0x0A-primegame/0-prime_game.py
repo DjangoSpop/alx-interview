@@ -1,6 +1,28 @@
 #!/usr/bin/python3
+
+
 def isWinner(x, nums):
+    """
+    Determines the winner of the prime game.
+
+    Args:
+        x (int): The number of rounds to be played.
+        nums (List[int]): A list of integers  stones in each round.
+
+    Returns:
+        str: The name of the winner ("Maria" or "Ben") or None if it's a tie.
+    """
+
     def is_prime(num):
+        """
+        Check if a number is prime.
+
+        Args:
+            num (int): The number to check.
+
+        Returns:
+            bool: True if the number is prime, False otherwise.
+        """
         if num < 2:
             return False
         for i in range(2, int(num ** 0.5) + 1):
@@ -9,9 +31,27 @@ def isWinner(x, nums):
         return True
 
     def memoize(func):
+        """
+        A decorator function that memoizes the result of a function call.
+
+        Args:
+            func (function): The function to be memoized.
+
+        Returns:
+            function: The memoized version of the function.
+        """
         cache = {}
 
         def wrapper(n):
+            """
+            A wrapper function that caches the result.
+
+            Args:
+                n (int): The input value for the decorated function.
+
+            Returns:
+                The result of the decorated function for the given input value.
+            """
             if n not in cache:
                 cache[n] = func(n)
             return cache[n]
@@ -19,6 +59,15 @@ def isWinner(x, nums):
 
     @memoize
     def play_game(n):
+        """
+        Determines if a player can win the prime game.
+
+        Args:
+            n (int): The number of stones.
+
+        Returns:
+            bool: True if the player can win the game, False otherwise.
+        """
         if n == 1:
             return False
         for i in range(2, n + 1):
