@@ -3,7 +3,7 @@
 
 
 def isWinner(x, nums):
-    """Function to get who has won in prime game"""
+    """Is Winner to get who has won in prime game."""
     mariaWinsCount = 0
     benWinsCount = 0
 
@@ -42,7 +42,7 @@ def isWinner(x, nums):
 
 
 def is_prime(n):
-    """Returns True if n is prime, else False."""
+    """Return True if n is prime, else False."""
     if n < 2:
         return False
     for i in range(2, int(n ** 0.5) + 1):
@@ -52,6 +52,6 @@ def is_prime(n):
 
 
 def primes_in_range(start, end):
-    """Returns a list of prime numbers between start and end (inclusive)."""
+    """Return a list of prime numbers between start and end (inclusive)."""
     primes = [n for n in range(start, end+1) if is_prime(n)]
     return primes
