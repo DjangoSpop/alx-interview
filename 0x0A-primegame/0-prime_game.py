@@ -17,7 +17,7 @@ def isWinner(x, nums):
 
         isMariaTurns = True
 
-        while(True):
+        while (True):
             if not primesSet:
                 if isMariaTurns:
                     benWinsCount += 1
